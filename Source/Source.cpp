@@ -33,18 +33,18 @@ int main() {
 	std::string EmailIn;
 	std::string PasswordIn;
 
-
+	Sql.RunQuery("INSERT INTO FinanceTrackerSheet(Email, Password, Account, Balance) VALUES('test2', 'test2', 'test2', 'test2')");
 
 	std::vector<std::string>VectorString = TestQuery(VectorString);
 	std::vector<char> TestVec;
-	Sql.SQLQuery("SELECT Account FROM FinanceTrackerSheet;", VectorString);
+	Sql.RunQuery("SELECT Account FROM FinanceTrackerSheet;", VectorString);
 	//TestVec.push_back(TestQuery);
 
 	for (const auto& i : VectorString) {
 		std::cout << i << std::endl;
 
 	}
-	
+
 	std::cout << "Welcome, would you like to login to an existing account or create an account?\n";
 	std::cin >> Choice;
 

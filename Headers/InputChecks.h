@@ -73,7 +73,7 @@ public:
 
 	void showSQLError(unsigned int handleType, const SQLHANDLE& handle);
 	bool Connect();
-	char SQLQuery(const char* Query, std::vector<std::string> StringVec = {});
+	char RunQuery(const char* Query, std::vector<std::string> StringVec = {});
 
 
 
