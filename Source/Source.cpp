@@ -28,16 +28,19 @@ int main() {
 	SqlConnect Sql;
 	int Choice;
 
+	double test{ 0 };
+	test = Sql.RunQuery<double>("SELECT Account FROM FinanceTrackerSheet ORDER BY Account DESC");
+
 	std::vector<std::string> Emails;
 	std::vector<std::string> Passwords;
 	std::string EmailIn;
 	std::string PasswordIn;
 
-	Sql.RunQuery("INSERT INTO FinanceTrackerSheet(Email, Password, Account, Balance) VALUES('test2', 'test2', 'test2', 'test2')");
+	Sql.RunQuery<char>("INSERT INTO FinanceTrackerSheet(Email, Password, Account, Balance) VALUES('test2', 'test2', 'test2', 'test2')");
 
 	std::vector<std::string>VectorString = TestQuery(VectorString);
 	std::vector<char> TestVec;
-	Sql.RunQuery("SELECT Account FROM FinanceTrackerSheet;", VectorString);
+	Sql.RunQuery<std::string>("SELECT Account FROM FinanceTrackerSheet;", VectorString);
 	//TestVec.push_back(TestQuery);
 
 	for (const auto& i : VectorString) {

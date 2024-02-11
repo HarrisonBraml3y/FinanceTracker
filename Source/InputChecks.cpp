@@ -50,13 +50,13 @@ double InputChecks::GenerateAccount() {
 	int Loop = 0;
 	//std::rand(std::time(nullptr));
 	//Problem here, function must return a value for it to be a condition
-	while (Sql.RunQuery("SELECT Account FROM FinanceTrackerSheet;")) {
+	while (Sql.RunQuery<double>("SELECT Account FROM FinanceTrackerSheet;")) {
 		Loop++;
-		Accounts.push_back(Sql.RunQuery("SELECT Account FROM FinanceTrackerSheet;"));
+		Accounts.push_back(Sql.RunQuery<double>("SELECT Account FROM FinanceTrackerSheet;"));
 	}
 
 
-	Sql.RunQuery("SELECT Account FROM FinanceTrackerSheet ORDER BY Account DESC");
+	Account = Sql.RunQuery<double>("SELECT Account FROM FinanceTrackerSheet ORDER BY Account DESC");
 	
 	return Account;
 }
@@ -129,7 +129,7 @@ double WriteToFile::Add(double& In) {
 	std::string Query = ("INSERT INTO FinanceTrackerSheet (Account, Balance) VALUES('', '" + BalanceString.str() + "'); ");
 	const char* QueryChar = Query.c_str();
 
-	SqlFunctions.RunQuery(QueryChar);
+	SqlFunctions.RunQuery<char>(QueryChar);
 
 	std::cout << "Balance: " << Balance << std::endl;
 	return In;
@@ -237,7 +237,10 @@ bool SqlConnect::Connect() {
 	} while (FALSE);
 }
 
-char SqlConnect::RunQuery(const char* Query, std::vector<std::string> StringVec) {
+template<typename T>
+T SqlConnect::RunQuery(const char* Query) {
+	T Result;
+	std::vector<T> ResultVector;
 
 	if (!Connect()) {
 		std::cout << "No connection" << std::endl;
@@ -271,8 +274,8 @@ char SqlConnect::RunQuery(const char* Query, std::vector<std::string> StringVec)
 
 
 					std::cout << "Balance: " << Balance << std::endl;
-					if (!StringVec.empty()) {
-						StringVec.push_back(Balance);
+					if (!ResultVector.empty()) {
+						ResultVector.push_back(Balance);
 
 					}
 
@@ -285,13 +288,19 @@ char SqlConnect::RunQuery(const char* Query, std::vector<std::string> StringVec)
 
 
 					std::cout << "Account " << Account << std::endl;
-					if (!StringVec.empty()) {
-						StringVec.push_back(Account);
+					if (!ResultVector.empty()) {
+						ResultVector.push_back(Account);
 
 					}
 				}
 
 				std::cout << "Final FetchResult: " << FetchResult << std::endl;
+			}
+			if (Query == "SELECT Account FROM FinanceTrackerSheet ORDER BY Account DESC") {
+				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
+					SQLGetData(SqlStmtHandle, 3, SQL_C_DEFAULT, &LastAccount, sizeof(LastAccount), NULL);
+					return Result;
+				}
 			}
 			return 1;
 		}
