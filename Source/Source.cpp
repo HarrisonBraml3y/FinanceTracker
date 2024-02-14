@@ -10,15 +10,6 @@
 #include "Headers/InputChecks.h"
 
 
-//Below is method to populate sql search results
-std::vector<std::string> TestQuery(std::vector<std::string> In) {
-	std::vector<std::string> Strings = { "1", "2", "3" };
-	std::vector<std::string> ReturnValue;
-	for (int i = 0; i != 3; i++) {
-		In.push_back(Strings[i]);
-	}
-	return In;
-}
 
 
 
@@ -29,7 +20,9 @@ int main() {
 	int Choice;
 
 	double test{ 0 };
-	test = Sql.RunQuery<double>("SELECT Account FROM FinanceTrackerSheet ORDER BY Account DESC");
+	test = Sql.RunQuery<double>("SELECT TOP 1 Account FROM FinanceTrackerSheet ORDER BY Account DESC");
+	std::cout << "test: " << test << std::endl;
+
 
 	std::vector<std::string> Emails;
 	std::vector<std::string> Passwords;
@@ -38,17 +31,16 @@ int main() {
 
 	Sql.RunQuery<char>("INSERT INTO FinanceTrackerSheet(Email, Password, Account, Balance) VALUES('test2', 'test2', 'test2', 'test2')");
 
-	std::vector<std::string>VectorString = TestQuery(VectorString);
-	std::vector<char> TestVec;
+	std::vector<std::string>VectorString;
 	Sql.RunQuery<std::string>("SELECT Account FROM FinanceTrackerSheet;", VectorString);
 	//TestVec.push_back(TestQuery);
 
 	for (const auto& i : VectorString) {
-		std::cout << i << std::endl;
+		std::cout << "Number of accounts: " << i << std::endl;
 
 	}
 
-	std::cout << "Welcome, would you like to login to an existing account or create an account?\n";
+	std::cout << "Would you like to login to an existing account or create an account?\n";
 	std::cin >> Choice;
 
 	switch (Choice) {

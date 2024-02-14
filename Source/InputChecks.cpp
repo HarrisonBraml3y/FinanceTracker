@@ -238,9 +238,9 @@ bool SqlConnect::Connect() {
 }
 
 template<typename T>
-T SqlConnect::RunQuery(const char* Query) {
+T SqlConnect::RunQuery(const char* Query, std::vector<std::string>& StringVector) {
 	T Result;
-	std::vector<T> ResultVector;
+	std::vector <std::string> ResultVector;
 
 	if (!Connect()) {
 		std::cout << "No connection" << std::endl;
@@ -270,15 +270,15 @@ T SqlConnect::RunQuery(const char* Query) {
 			char Account[256];
 			if (Query == "SELECT * FROM FinanceTrackerSheet;") {
 				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
-					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Balance, sizeof(Balance), NULL);
+					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &ResultVector, sizeof(ResultVector), NULL);
 
-
+					/*
 					std::cout << "Balance: " << Balance << std::endl;
 					if (!ResultVector.empty()) {
 						ResultVector.push_back(Balance);
 
 					}
-
+					*/
 				}
 			}
 
@@ -287,18 +287,22 @@ T SqlConnect::RunQuery(const char* Query) {
 					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Account, sizeof(Account), NULL);
 
 
+					
 					std::cout << "Account " << Account << std::endl;
 					if (!ResultVector.empty()) {
-						ResultVector.push_back(Account);
+						std::string accountString(Account);
+						StringVector.push_back(Account);
 
 					}
+					return StringVector;
+					
 				}
 
 				std::cout << "Final FetchResult: " << FetchResult << std::endl;
 			}
 			if (Query == "SELECT Account FROM FinanceTrackerSheet ORDER BY Account DESC") {
 				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
-					SQLGetData(SqlStmtHandle, 3, SQL_C_DEFAULT, &LastAccount, sizeof(LastAccount), NULL);
+					SQLGetData(SqlStmtHandle, 3, SQL_C_DEFAULT, &Result, sizeof(Result), NULL);
 					return Result;
 				}
 			}

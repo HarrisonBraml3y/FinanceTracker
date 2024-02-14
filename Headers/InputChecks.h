@@ -8,7 +8,6 @@
 #include <sqltypes.h>
 #include <sql.h>
 
-
 class InputChecks {
 private:
 protected:
@@ -75,7 +74,7 @@ public:
 	bool Connect();
 
 	template<typename T>
-	T RunQuery(const char* Query);
+	T RunQuery(const char* Query, std::vector<std::string>& StringVector);
 
 
 
