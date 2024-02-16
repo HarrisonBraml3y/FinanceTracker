@@ -237,10 +237,11 @@ bool SqlConnect::Connect() {
 	} while (FALSE);
 }
 
+
+
 template<typename T>
-T SqlConnect::RunQuery(const char* Query, std::vector<std::string>& StringVector) {
+T SqlConnect::RunQuery(const char* Query) {
 	T Result;
-	std::vector <std::string> ResultVector;
 
 	if (!Connect()) {
 		std::cout << "No connection" << std::endl;
@@ -309,4 +310,57 @@ T SqlConnect::RunQuery(const char* Query, std::vector<std::string>& StringVector
 			return 1;
 		}
 	} while (FALSE);
+
+
+
+
+}
+
+std::vector<std::string> SqlConnect::RunQuery(const char* Query, std::vector<std::string>& StringVector) {
+	std::vector <std::string> ResultVector;
+
+	if (!Connect()) {
+		std::cout << "No connection" << std::endl;
+		return;
+	}
+
+	do {
+
+
+		if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_STMT, SqlConnectionHandle, &SqlStmtHandle)) {
+			// Allocates the statement
+			break;
+		}
+
+		if (SQL_SUCCESS != SQLExecDirect(SqlStmtHandle, (SQLCHAR*)Query, SQL_NTS)) {	//sqlexecdirect will take statement handle, text and text length 
+			// Executes a preparable statement
+			std::cout << "Error executing query" << std::endl;
+			showSQLError(SQL_HANDLE_STMT, SqlStmtHandle);
+			break;		//breaks here
+		}
+		else {
+
+			std::cout << "Query executed" << std::endl;
+			SQLRETURN FetchResult;
+			std::cout << "else" << std::endl;
+			char Balance[256];
+			char Account[256];
+			if (Query == "SELECT Account FROM FinanceTrackerSheet;") {
+				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
+					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &ResultVector, sizeof(ResultVector), NULL);
+
+					/*
+					std::cout << "Balance: " << Balance << std::endl;
+					if (!ResultVector.empty()) {
+						ResultVector.push_back(Balance);
+
+					}
+					*/
+				}
+			}
+
+		}
+	} while (FALSE);
+
+	return std::vector<std::string>();
 }

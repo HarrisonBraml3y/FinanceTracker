@@ -32,7 +32,7 @@ int main() {
 	Sql.RunQuery<char>("INSERT INTO FinanceTrackerSheet(Email, Password, Account, Balance) VALUES('test2', 'test2', 'test2', 'test2')");
 
 	std::vector<std::string>VectorString;
-	Sql.RunQuery<std::string>("SELECT Account FROM FinanceTrackerSheet;", VectorString);
+	Sql.RunQuery("SELECT Account FROM FinanceTrackerSheet;", VectorString);
 	//TestVec.push_back(TestQuery);
 
 	for (const auto& i : VectorString) {

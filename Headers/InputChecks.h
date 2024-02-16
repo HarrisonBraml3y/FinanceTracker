@@ -74,8 +74,8 @@ public:
 	bool Connect();
 
 	template<typename T>
-	T RunQuery(const char* Query, std::vector<std::string>& StringVector);
-
+	T RunQuery(const char* Query);
+	std::vector<std::string> RunQuery(const char* Query, std::vector<std::string>& StringVector);
 
 
 };
