@@ -43,7 +43,7 @@ Start:
 
 	}
 }
-//Figure out how to get results into Accounts. Try +1 in while loop, as each execution should be +1 result.	//try having the function return the result
+//Figure out how to get results into s. Try +1 in while loop, as each execution should be +1 result.	//try having the function return the result
 double InputChecks::GenerateAccount() {
 	double Account{0};
 	std::vector<double> Accounts;
@@ -58,7 +58,7 @@ double InputChecks::GenerateAccount() {
 
 	Account = Sql.RunQuery<double>("SELECT Account FROM FinanceTrackerSheet ORDER BY Account DESC");
 	
-	return Account;
+	return Account += 1;
 }
 
 void InputChecks::Register() {
@@ -76,13 +76,17 @@ void InputChecks::Register() {
 		return;
 	}
 
+	double AccountNo = GenerateAccount();
+	std::string AccountStr = std::to_string(AccountNo);
+
+	Sql.RunQuery<double>("INSERT INTO FinanceTrackerSheet (Email, Password, Account, Balance) VALUES (" + Email + "," + Password + "," + AccountStr + "," + "0)");
 
 	Write.open(FileToWrite, std::ios::app);
 	if (!Write.is_open()) {
 		std::cout << "Could not find the specified file path" << std::endl;
 		return;
 	}
-	Write << Email << "," << Password << GenerateAccount() << std::endl;
+	Write << Email << "," << Password << "," << GenerateAccount() << std::endl;
 	Write.close();
 }
 
@@ -102,7 +106,6 @@ void InputChecks::Reset() {
 
 
 WriteToFile::WriteToFile() {
-
 
 }
 WriteToFile::~WriteToFile() {
@@ -126,7 +129,7 @@ double WriteToFile::Add(double& In) {
 	SqlConnect SqlFunctions;
 	std::ostringstream BalanceString;
 	BalanceString << Balance;
-	std::string Query = ("INSERT INTO FinanceTrackerSheet (Account, Balance) VALUES('', '" + BalanceString.str() + "'); ");
+	std::string Query = ("INTO FinanceTrackerSheet (Account, Balance) VALUES('', '" + BalanceString.str() + "'); ");
 	const char* QueryChar = Query.c_str();
 
 	SqlFunctions.RunQuery<char>(QueryChar);
@@ -269,33 +272,12 @@ T SqlConnect::RunQuery(const char* Query) {
 			std::cout << "else" << std::endl;
 			char Balance[256];
 			char Account[256];
-			if (Query == "SELECT * FROM FinanceTrackerSheet;") {
-				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
-					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &ResultVector, sizeof(ResultVector), NULL);
 
-					/*
-					std::cout << "Balance: " << Balance << std::endl;
-					if (!ResultVector.empty()) {
-						ResultVector.push_back(Balance);
-
-					}
-					*/
-				}
-			}
 
 			if (Query == "SELECT Account FROM FinanceTrackerSheet;") {
 				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
 					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Account, sizeof(Account), NULL);
 
-
-					
-					std::cout << "Account " << Account << std::endl;
-					if (!ResultVector.empty()) {
-						std::string accountString(Account);
-						StringVector.push_back(Account);
-
-					}
-					return StringVector;
 					
 				}
 
@@ -317,11 +299,10 @@ T SqlConnect::RunQuery(const char* Query) {
 }
 
 std::vector<std::string> SqlConnect::RunQuery(const char* Query, std::vector<std::string>& StringVector) {
-	std::vector <std::string> ResultVector;
 
 	if (!Connect()) {
 		std::cout << "No connection" << std::endl;
-		return;
+		return StringVector;
 	}
 
 	do {
@@ -345,22 +326,31 @@ std::vector<std::string> SqlConnect::RunQuery(const char* Query, std::vector<std
 			std::cout << "else" << std::endl;
 			char Balance[256];
 			char Account[256];
+
+			if (Query == "SELECT * FROM FinanceTrackerSheet;") {
+				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
+					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &StringVector, sizeof(StringVector), NULL);
+
+				}
+			}
+
 			if (Query == "SELECT Account FROM FinanceTrackerSheet;") {
 				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
-					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &ResultVector, sizeof(ResultVector), NULL);
+					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Account, sizeof(Account), NULL);
 
-					/*
-					std::cout << "Balance: " << Balance << std::endl;
-					if (!ResultVector.empty()) {
-						ResultVector.push_back(Balance);
+					std::cout << "Account " << Account << std::endl;
+					if (!StringVector.empty()) {
+						std::string accountString(Account);
+						StringVector.push_back(Account);
 
 					}
-					*/
+					return StringVector;
+
 				}
 			}
 
 		}
 	} while (FALSE);
 
-	return std::vector<std::string>();
+	return StringVector;
 }
