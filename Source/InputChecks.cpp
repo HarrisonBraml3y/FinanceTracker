@@ -78,16 +78,12 @@ void InputChecks::Register() {
 
 	double AccountNo = GenerateAccount();
 	std::string AccountStr = std::to_string(AccountNo);
+	std::string TempQuery = "INSERT INTO FinanceTrackerSheet (Email, Password, Account, Balance) VALUES (" + Email + "," + Password + "," + AccountStr + "," + "0)";
+	const char* QueryChar = TempQuery.c_str();
 
-	Sql.RunQuery<double>("INSERT INTO FinanceTrackerSheet (Email, Password, Account, Balance) VALUES (" + Email + "," + Password + "," + AccountStr + "," + "0)");
+	Sql.RunQuery<double>(QueryChar);
 
-	Write.open(FileToWrite, std::ios::app);
-	if (!Write.is_open()) {
-		std::cout << "Could not find the specified file path" << std::endl;
-		return;
-	}
-	Write << Email << "," << Password << "," << GenerateAccount() << std::endl;
-	Write.close();
+
 }
 
 void InputChecks::Reset() {
@@ -251,9 +247,8 @@ T SqlConnect::RunQuery(const char* Query) {
 		return 0;
 	}
 
-	do {
 
-
+	do{
 		if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_STMT, SqlConnectionHandle, &SqlStmtHandle)) {
 			// Allocates the statement
 			break;
@@ -263,7 +258,7 @@ T SqlConnect::RunQuery(const char* Query) {
 			// Executes a preparable statement
 			std::cout << "Error executing query" << std::endl;
 			showSQLError(SQL_HANDLE_STMT, SqlStmtHandle);
-			break;		//breaks here
+			break;
 		}
 		else {
 
@@ -283,16 +278,23 @@ T SqlConnect::RunQuery(const char* Query) {
 
 				std::cout << "Final FetchResult: " << FetchResult << std::endl;
 			}
-			if (Query == "SELECT Account FROM FinanceTrackerSheet ORDER BY Account DESC") {
+			if (Query == "SELECT TOP 1 Account FROM FinanceTrackerSheet ORDER BY Account DESC") {
 				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
 					SQLGetData(SqlStmtHandle, 3, SQL_C_DEFAULT, &Result, sizeof(Result), NULL);
 					return Result;
 				}
 			}
+
+			else {
+				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
+					SQLGetData(SqlStmtHandle, 3, SQL_C_DEFAULT, &Result, sizeof(Result), NULL);
+					return Result;
+				}
+				std::cout << "Executed" << std::endl;
+			}
 			return 1;
 		}
-	} while (FALSE);
-
+	} while (false);
 
 
 
