@@ -19,8 +19,11 @@ int main() {
 	SqlConnect Sql;
 	int Choice;
 
-	double test{ 0 };
-	test = Sql.RunQuery<double>("SELECT TOP 1 Account FROM FinanceTrackerSheet ORDER BY Account DESC");
+
+
+
+
+	double test = Sql.RunQuery<double>("SELECT Account FROM FinanceTrackerSheet ORDER BY Account DESC");
 	std::cout << "test: " << test << std::endl;
 
 
@@ -29,14 +32,14 @@ int main() {
 	std::string EmailIn;
 	std::string PasswordIn;
 
-	std::vector<std::string>VectorString;
-	Sql.RunQuery("SELECT Account FROM FinanceTrackerSheet;", VectorString);
-	//TestVec.push_back(TestQuery);
-
-	for (const auto& i : VectorString) {
-		std::cout << "Number of accounts: " << i << std::endl;
-
-	}
+	//std::vector<std::string>VectorString;
+	//Sql.RunQuery("SELECT Account FROM FinanceTrackerSheet;", VectorString);
+	////TestVec.push_back(TestQuery);
+	//
+	//for (const auto& i : VectorString) {
+	//	std::cout << "Number of accounts: " << i << std::endl;
+	//
+	//}
 
 	std::cout << "Would you like to login to an existing account or create an account?\n";
 	std::cin >> Choice;
