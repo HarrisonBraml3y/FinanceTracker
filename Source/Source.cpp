@@ -23,7 +23,7 @@ int main() {
 
 
 
-	double test = Sql.RunQuery<double>("SELECT Account FROM FinanceTrackerSheet ORDER BY Account DESC");
+	double test = Sql.RunQuery<double>("SELECT TOP 1 Account FROM FinanceTrackerSheet ORDER BY Account DESC");
 	std::cout << "test: " << test << std::endl;
 
 
