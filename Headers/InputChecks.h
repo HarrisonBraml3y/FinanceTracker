@@ -14,7 +14,7 @@ protected:
 public:
 
 
-	bool Login(std::vector<std::string> Emails, std::vector<std::string> Passwords, std::string Email, std::string Password);
+	bool Login(std::string Email, std::string Password);
 	double GenerateAccount();
 	void Register();
 	void Reset();

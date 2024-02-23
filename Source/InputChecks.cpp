@@ -11,7 +11,8 @@ std::string FileToWrite = "C:\\Users\\harri\\Desktop\\FinanceTrackerSheet.csv";
 std::ofstream Write;
 std::ifstream WriteIn;
 
-bool InputChecks::Login(std::vector<std::string> Emails, std::vector<std::string> Passwords, std::string Email, std::string Password) {
+bool InputChecks::Login(std::string Email, std::string Password) {
+	SqlConnect Sql;
 Start:
 
 	std::cout << "Enter your e-mail address" << std::endl;
@@ -19,7 +20,10 @@ Start:
 	std::cout << "Enter your password" << std::endl;
 	std::cin >> Password;
 
+	if (!Sql.RunQuery<bool>("SELECT Email FROM FinanceTrackerSheet where Email = '" + Email + "'")) {
 
+
+	}
 	std::cout << "Login()" << std::endl;
 	std::cout << "Password[1] = " << Passwords[1] << std::endl;
 	std::cout << "Emails[1] = " << Emails[1] << std::endl;
@@ -42,6 +46,9 @@ Start:
 		}
 
 	}
+
+
+
 }
 //Figure out how to get results into s. Try +1 in while loop, as each execution should be +1 result.	//try having the function return the result
 double InputChecks::GenerateAccount() {
@@ -76,8 +83,9 @@ void InputChecks::Register() {
 	}
 
 	double AccountNo = GenerateAccount();
+	std::cout << "Account number: " << AccountNo << std::endl;
 	std::string AccountStr = std::to_string(AccountNo);
-	std::string TempQuery = "INSERT INTO FinanceTrackerSheet (Email, Password, Account, Balance) VALUES (" + Email + "," + Password + "," + AccountStr + "," + "0)";
+	std::string TempQuery = "INSERT INTO FinanceTrackerSheet (Email, Password, Account, Balance) VALUES ('" + Email + "', '" + Password + "', '" + AccountStr + "', '" + "0')";
 	const char* QueryChar = TempQuery.c_str();
 
 	Sql.RunQuery<double>(QueryChar);
@@ -260,7 +268,8 @@ T SqlConnect::RunQuery(const char* Query) {
 			std::cout << "Error executing query" << std::endl;
 			showSQLError(SQL_HANDLE_STMT, SqlStmtHandle);
 			break;
-		}
+		}		
+
 		else {
 
 			std::cout << "Query executed" << std::endl;
@@ -271,7 +280,7 @@ T SqlConnect::RunQuery(const char* Query) {
 
 			if (Query == "SELECT Account FROM FinanceTrackerSheet;") {							//this check if running each loop reglardless of the query
 				std::cout << "X" << std::endl;
-				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
+				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS_WITH_INFO) {
 					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Result, sizeof(Result), NULL);
 					std::cout << "Result: " << Result << std::endl;
 					
@@ -280,20 +289,7 @@ T SqlConnect::RunQuery(const char* Query) {
 
 				std::cout << "Final FetchResult: " << FetchResult << std::endl;
 			}
-			//if (Query == "SELECT Account FROM FinanceTrackerSheet ORDER BY Account DESC") {
-			//	while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
-			//		SQLGetData(SqlStmtHandle, 3, SQL_C_DEFAULT, &Account, sizeof(Account), NULL);
-			//		for (auto i : Account) {
-			//			std::cout << "Account: ";
-			//
-			//			std::cout << i << std::endl;
-			//		}
-			//		std::string AccountString(Account); // Convert char array to string
-			//		Result = AccountString;
-			//
-			//		return Result;
-			//	}
-			//}
+
 			if (Query == "SELECT TOP 1 Account FROM FinanceTrackerSheet ORDER BY Account DESC") {
 				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS_WITH_INFO) {
 					SQLGetData(SqlStmtHandle, 3, SQL_C_DEFAULT, &Account, sizeof(Account), NULL);
