@@ -6,7 +6,6 @@
 
 
 SqlConnect Sql;
-
 std::string FileToWrite = "C:\\Users\\harri\\Desktop\\FinanceTrackerSheet.csv";
 std::ofstream Write;
 std::ifstream WriteIn;
@@ -19,8 +18,7 @@ Start:
 	std::cin >> Email;
 	std::cout << "Enter your password" << std::endl;
 	std::cin >> Password;
-
-	if (!Sql.RunQuery<bool>("SELECT Email FROM FinanceTrackerSheet where Email = '" + Email + "'")) {
+	if (!Sql.RunQuery<bool>("SELECT Email FROM FinanceTrackerSheet where Email = '" + Email + "'")) {	//email needds to be char
 
 
 	}
@@ -89,6 +87,7 @@ void InputChecks::Register() {
 	const char* QueryChar = TempQuery.c_str();
 
 	Sql.RunQuery<double>(QueryChar);
+
 
 
 }
