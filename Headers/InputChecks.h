@@ -18,6 +18,7 @@ public:
 	double GenerateAccount();
 	void Register();
 	void Reset();
+	double UpdateBalance(double Account);
 
 
 };

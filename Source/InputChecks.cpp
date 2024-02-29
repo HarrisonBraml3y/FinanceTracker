@@ -18,39 +18,37 @@ Start:
 	std::cin >> Email;
 	std::cout << "Enter your password" << std::endl;
 	std::cin >> Password;
-	if (!Sql.RunQuery<bool>("SELECT Email FROM FinanceTrackerSheet where Email = '" + Email + "'")) {	//email needds to be char
 
-
+	std::string Temp = "SELECT Email FROM FinanceTrackerSheet where Email = '" + Email + "'";
+	const char* QueryStr = Temp.c_str();
+	if (!Sql.RunQuery<bool>(QueryStr)) {		//figure out if logged in, allow user to check accounts, edit accounts etc. 
+		std::cout << "Account details not found" << std::endl;
+		return false;
 	}
-	std::cout << "Login()" << std::endl;
-	std::cout << "Password[1] = " << Passwords[1] << std::endl;
-	std::cout << "Emails[1] = " << Emails[1] << std::endl;
-	for (int i = 0; i < Emails.size(); i++) {
-		if (Email == Emails[i] && Password == Passwords[i]) {
-			std::cout << "Logged in" << std::endl;
-			return true;
-		}
+	else {
+		std::cout << "Logged in" << std::endl;
+		std::cout << "> Update balance\n > Option2\n >Option3\n >Option4\n ";		//need funcs for each option, un-scattered 
 
-		else {
-			std::cout << "Incorrect email or password." << std::endl;
-			if (Email == Emails[i] && Password != Passwords[i]) {
-				std::cout << "Would you like to reset your password?" << std::endl;
-			}
 
-			else {
-				goto Start;
-			}
-			return false;
-		}
-
+		return true;
 	}
-
-
 
 }
+
+double InputChecks::UpdateBalance(double Account) {
+	SqlConnect Sql;
+	std::string AccountString = std::to_string(Account);
+	std::string Temp = "SELECT Balance From FinanceTrackerSheet WHERE Account = " + AccountString;
+	const char* Query = Temp.c_str();
+	double NewBalance = Sql.RunQuery<double>(Query);
+	std::cout << "Updated balance to: " << NewBalance << std::endl;
+	return Account;
+}
+
+
 //Figure out how to get results into s. Try +1 in while loop, as each execution should be +1 result.	//try having the function return the result
 double InputChecks::GenerateAccount() {
-	double Account{0};
+	double Account{ 0 };
 	std::vector<double> Accounts;
 	int Loop = 0;
 	//std::rand(std::time(nullptr));

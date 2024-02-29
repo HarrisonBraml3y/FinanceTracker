@@ -18,8 +18,12 @@ int main() {
 	WriteToFile WriteTo;
 	SqlConnect Sql;
 	int Choice;
-
-
+	double Test = 1;
+	std::string AccountString = std::to_string(Test);
+	std::string Temp = "SELECT Balance From FinanceTrackerSheet WHERE Account = '" + AccountString + "'";
+	const char* Query = Temp.c_str();
+	double NewBalance = Sql.RunQuery<double>(Query);
+	std::cout << "Updated balance to: " << NewBalance << std::endl;
 
 
 	double test = Sql.RunQuery<double>("SELECT TOP 1 Account FROM FinanceTrackerSheet ORDER BY Account DESC");
@@ -51,7 +55,7 @@ int main() {
 		std::cout << "\n Password: ";
 		std::cin >> PasswordIn;
 
-		Input.Login(Emails, Passwords, EmailIn, PasswordIn);
+		//Input.Login(Emails, Passwords, EmailIn, PasswordIn);
 		break;
 	case 2:
 		Input.Register();
