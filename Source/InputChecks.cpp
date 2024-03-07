@@ -35,11 +35,16 @@ Start:
 
 }
 
-double InputChecks::UpdateBalance(double Account) {
+double InputChecks::UpdateBalance(double Account, double NewValue) {
 	SqlConnect Sql;
 	std::string AccountString = std::to_string(Account);
-	std::string Temp = "SELECT Balance From FinanceTrackerSheet WHERE Account = " + AccountString;
-	const char* Query = Temp.c_str();
+	std::string NewValueString = std::to_string(NewValue);
+	std::string GetString = "SELECT Balance FROM FinanceTrackerSheet WHERE Account = '" + AccountString + "'";
+	const char* GetValue = GetString.c_str();
+	double OldBalance = Sql.RunQuery<double>(GetValue);
+	//double NewBalance = OldBalance + NewValue;
+	std::string UpdateString = "UPDATE FinanceTrackerSheet SET Balance = " + NewValueString + " WHERE Account = '" + AccountString + "'";
+	const char* Query = UpdateString.c_str();
 	double NewBalance = Sql.RunQuery<double>(Query);
 	std::cout << "Updated balance to: " << NewBalance << std::endl;
 	return Account;
@@ -210,7 +215,7 @@ bool SqlConnect::Connect() {
 		case SQL_SUCCESS_WITH_INFO:
 			std::cout << "SQL_SUCCESS_WITH_INFO" << std::endl;
 			showSQLError(SQL_HANDLE_STMT, SqlStmtHandle);
-			return true;
+ 			return true;
 
 			break;
 		case SQL_NO_DATA_FOUND:
@@ -245,7 +250,7 @@ bool SqlConnect::Connect() {
 template<typename T>
 T SqlConnect::RunQuery(const char* Query) {
 	std::cout << "Query: " << Query << std::endl;
-	T Result;
+	T Result{};
 	double Temp;
 
 	if (!Connect()) {
@@ -275,7 +280,7 @@ T SqlConnect::RunQuery(const char* Query) {
 			char Balance[256];
 			int Account[256];
 
-			if (Query == "SELECT Account FROM FinanceTrackerSheet;") {							//this check if running each loop reglardless of the query
+			if (Query == "SELECT Account FROM FinanceTrackerSheet") {							//this check if running each loop reglardless of the query
 				std::cout << "X" << std::endl;
 				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS_WITH_INFO) {
 					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Result, sizeof(Result), NULL);
@@ -300,14 +305,24 @@ T SqlConnect::RunQuery(const char* Query) {
 				}
 			}
 
+			if (Query == "SELECT Balance From FinanceTrackerSheet WHERE Account = '3'") {
+				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS_WITH_INFO) {
+					SQLGetData(SqlStmtHandle, 3, SQL_C_DEFAULT, &Account, sizeof(Account), NULL);
+					std::cout << "Balance: " << Account << std::endl;
+
+				}
+				std::cout << "Final FetchResult: " << FetchResult << std::endl;
+
+			}
 			else {
-				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
-					SQLGetData(SqlStmtHandle, 3, SQL_C_DEFAULT, &Result, sizeof(Result), NULL);
-					return Result;
+				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS_WITH_INFO) {
+					SQLGetData(SqlStmtHandle, 3, SQL_C_DEFAULT, &Account, sizeof(Account), NULL);
+					std::cout << "Balance: " << Account << std::endl;
+
 				}
 				std::cout << "Executed" << std::endl;
 			}
-			return 1;
+			return Result;
 		}
 	} while (false);
 

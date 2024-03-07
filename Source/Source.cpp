@@ -17,17 +17,20 @@ int main() {
 	InputChecks Input;
 	WriteToFile WriteTo;
 	SqlConnect Sql;
+	double A = Sql.RunQuery<double>("SELECT Balance From FinanceTrackerSheet WHERE Account = '3'");
+	std::cout << "A: " << A << std::endl;
 	int Choice;
-	double Test = 1;
-	std::string AccountString = std::to_string(Test);
-	std::string Temp = "SELECT Balance From FinanceTrackerSheet WHERE Account = '" + AccountString + "'";
-	const char* Query = Temp.c_str();
-	double NewBalance = Sql.RunQuery<double>(Query);
-	std::cout << "Updated balance to: " << NewBalance << std::endl;
+
+	//int Test = 3;
+	//std::string AccountString = std::to_string(Test);
+	//std::cout << AccountString << std::endl;
+	//std::string Temp = "SELECT Balance From FinanceTrackerSheet WHERE Account = '" + AccountString + "'";
+	//const char* Query = Temp.c_str();
+	//double NewBalance = Sql.RunQuery<double>(Query);
 
 
-	double test = Sql.RunQuery<double>("SELECT TOP 1 Account FROM FinanceTrackerSheet ORDER BY Account DESC");
-	std::cout << "test: " << test << std::endl;
+	//double test = Sql.RunQuery<double>("SELECT TOP 1 Account FROM FinanceTrackerSheet ORDER BY Account DESC");
+	//std::cout << "test: " << test << std::endl;
 
 
 	std::vector<std::string> Emails;
