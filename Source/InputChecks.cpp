@@ -182,8 +182,8 @@ void SqlConnect::showSQLError(unsigned int handleType, const SQLHANDLE& handle)
 	SQLCHAR Message[1024];
 	if (SQL_SUCCESS == SQLGetDiagRec(handleType, handle, 1, SQLState, NULL, Message, 1024, NULL))
 	//if (SQL_INVALID_HANDLE == SQLGetDiagRec(handleType, handle, 1, SQLState, NULL, Message, 1024, NULL))
-	// Returns the current values of multiple fields of a diagnostic record that contains error, warning, and status information
-		std::cout << "SQL driver message: " << Message << "\nSQL state: " << SQLState << "." << std::endl;
+// Returns the current values of multiple fields of a diagnostic record that contains error, warning, and status information
+std::cout << "SQL driver message: " << Message << "\nSQL state: " << SQLState << "." << std::endl;
 }
 
 bool SqlConnect::Connect() {
@@ -216,7 +216,7 @@ bool SqlConnect::Connect() {
 		case SQL_SUCCESS_WITH_INFO:
 			std::cout << "SQL_SUCCESS_WITH_INFO" << std::endl;
 			showSQLError(SQL_HANDLE_STMT, SqlStmtHandle);
- 			return true;
+			return true;
 
 			break;
 		case SQL_NO_DATA_FOUND:
@@ -251,7 +251,9 @@ bool SqlConnect::Connect() {
 template<typename T>
 T SqlConnect::RunQuery(const char* Query) {
 	std::cout << "Query: " << Query << std::endl;
-	T Result{};	
+	T Result{};
+	std::vector<T> ResultVector;
+
 	double Temp;
 
 	if (!Connect()) {
@@ -260,7 +262,7 @@ T SqlConnect::RunQuery(const char* Query) {
 	}
 
 
-	do{
+	do {
 		if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_STMT, SqlConnectionHandle, &SqlStmtHandle)) {
 			// Allocates the statement
 			break;
@@ -271,7 +273,7 @@ T SqlConnect::RunQuery(const char* Query) {
 			std::cout << "Error executing query" << std::endl;
 			showSQLError(SQL_HANDLE_STMT, SqlStmtHandle);
 			break;
-		}		
+		}
 
 		else {
 
@@ -280,9 +282,22 @@ T SqlConnect::RunQuery(const char* Query) {
 
 			char Balance[256];
 			int Account[256];
+			char Text[256];
+
+			if (Query == "SELECT * From FinanceTrackerSheet;") {
+				Connect();	//returns success with info
+				std::cout << "Table:\n";
+				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS_WITH_INFO){
+					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Text, sizeof(Text), NULL);
+					std::cout << Text << std::endl;
+				}
+				std::cout << "Final FetchResult: " << FetchResult << std::endl;
+
+				Connect();
+
+			}
 
 			if (Query == "SELECT Account FROM FinanceTrackerSheet") {							//this check if running each loop reglardless of the query
-				std::cout << "X" << std::endl;
 				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS_WITH_INFO) {
 					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Result, sizeof(Result), NULL);
 					std::cout << "Result: " << Result << std::endl;
@@ -293,7 +308,7 @@ T SqlConnect::RunQuery(const char* Query) {
 				std::cout << "Final FetchResult: " << FetchResult << std::endl;
 			}
 
-			if (Query == "SELECT TOP 1 Account FROM FinanceTrackerSheet ORDER BY Account DESC") {
+			if (Query == "SELECT TOP 1 Account FROM FinanceTrackerSheet") {
 				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS_WITH_INFO) {
 					SQLGetData(SqlStmtHandle, 3, SQL_C_DEFAULT, &Account, sizeof(Account), NULL);
 					for (auto i : Account) {
@@ -302,6 +317,14 @@ T SqlConnect::RunQuery(const char* Query) {
 						std::cout << i << std::endl;
 						Result = i;
 					}
+					return Result;
+				}
+			}
+
+			if (Query == "INSERT INTO FinanceTrackerSheet(Email, Password, Account, Balance) VALUES(2, 3, 4, 5)") {		//executes, but this runs false
+				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
+					SQLGetData(SqlStmtHandle, 3, SQL_C_DEFAULT, &Account, sizeof(Account), NULL);
+
 					return Result;
 				}
 			}

@@ -17,8 +17,14 @@ int main() {
 	InputChecks Input;
 	WriteToFile WriteTo;
 	SqlConnect Sql;
-	double A = Sql.RunQuery<double>("SELECT Balance From FinanceTrackerSheet WHERE Account = '3'");	//error, returns Result as initialised. 
-	std::cout << "A: " << A << std::endl;
+
+	Sql.RunQuery<char>("SELECT * From FinanceTrackerSheet;");
+
+	//char Last = Sql.RunQuery<char>("SELECT Balance From FinanceTrackerSheet WHERE Account = '3'");
+	//std::cout << "Last: " << Last << std::endl;
+
+	//double A = Sql.RunQuery<double>("SELECT Balance From FinanceTrackerSheet WHERE Account = '3'");	//error, returns Result as initialised. 
+	//std::cout << "A: " << A << std::endl;
 	int Choice;
 
 	//int Test = 3;
