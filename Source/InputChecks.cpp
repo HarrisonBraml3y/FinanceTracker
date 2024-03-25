@@ -281,7 +281,7 @@ T SqlConnect::RunQuery(const char* Query) {
 			SQLRETURN FetchResult;
 
 			char Balance[256];
-			int Account[256];
+			char Account[256];
 			char Text[256];
 
 			if (Query == "SELECT * From FinanceTrackerSheet;") {
@@ -298,12 +298,12 @@ T SqlConnect::RunQuery(const char* Query) {
 			}
 
 			if (Query == "SELECT Account FROM FinanceTrackerSheet") {							//this check if running each loop reglardless of the query
-				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS_WITH_INFO) {
-					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Result, sizeof(Result), NULL);
-					std::cout << "Result: " << Result << std::endl;
+				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
+					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Account, sizeof(Account), NULL);
+					std::cout << "Result: " << Account << std::endl;
 					
-					return Result;
 				}
+				return Result;
 
 				std::cout << "Final FetchResult: " << FetchResult << std::endl;
 			}
