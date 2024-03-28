@@ -18,7 +18,7 @@ int main() {
 	WriteToFile WriteTo;
 	SqlConnect Sql;
 
-	Sql.RunQuery<char>("SELECT Account FROM FinanceTrackerSheet");
+	Sql.RunQuery<char>("SELECT TOP 1 Account FROM FinanceTrackerSheet");
 
 	//char Last = Sql.RunQuery<char>("SELECT Balance From FinanceTrackerSheet WHERE Account = '3'");
 	//std::cout << "Last: " << Last << std::endl;

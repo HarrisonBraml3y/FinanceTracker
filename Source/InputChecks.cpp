@@ -285,7 +285,6 @@ T SqlConnect::RunQuery(const char* Query) {
 			char Text[256];
 
 			if (Query == "SELECT * From FinanceTrackerSheet;") {
-				Connect();	//returns success with info
 				std::cout << "Table:\n";
 				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS_WITH_INFO){
 					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Text, sizeof(Text), NULL);
@@ -293,11 +292,9 @@ T SqlConnect::RunQuery(const char* Query) {
 				}
 				std::cout << "Final FetchResult: " << FetchResult << std::endl;
 
-				Connect();
-
 			}
 
-			if (Query == "SELECT Account FROM FinanceTrackerSheet") {							//this check if running each loop reglardless of the query
+			if (Query == "SELECT Account FROM FinanceTrackerSheet") {
 				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
 					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Account, sizeof(Account), NULL);
 					std::cout << "Result: " << Account << std::endl;
@@ -309,16 +306,12 @@ T SqlConnect::RunQuery(const char* Query) {
 			}
 
 			if (Query == "SELECT TOP 1 Account FROM FinanceTrackerSheet") {
-				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS_WITH_INFO) {
-					SQLGetData(SqlStmtHandle, 3, SQL_C_DEFAULT, &Account, sizeof(Account), NULL);
-					for (auto i : Account) {
-						std::cout << "Account: ";
+				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
+					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Account, sizeof(Account), NULL);
+					std::cout << "Account: " << Account << std::endl;
 			
-						std::cout << i << std::endl;
-						Result = i;
-					}
-					return Result;
 				}
+				return Result;
 			}
 
 			if (Query == "INSERT INTO FinanceTrackerSheet(Email, Password, Account, Balance) VALUES(2, 3, 4, 5)") {		//executes, but this runs false
