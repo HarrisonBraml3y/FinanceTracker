@@ -18,7 +18,11 @@ int main() {
 	WriteToFile WriteTo;
 	SqlConnect Sql;
 
-	Sql.RunQuery<char>("SELECT TOP 1 Account FROM FinanceTrackerSheet");
+	std::string Bal = Sql.RunQuery<std::string>("SELECT Email FROM FinanceTrackerSheet");
+	std::cout << "Bal: " << Bal << std::endl;
+
+//	int Bal = Sql.RunQuery<std::string>("SELECT Balance From FinanceTrackerSheet WHERE Account = '3'");
+//	std::cout << Bal << std::endl; 
 
 	//char Last = Sql.RunQuery<char>("SELECT Balance From FinanceTrackerSheet WHERE Account = '3'");
 	//std::cout << "Last: " << Last << std::endl;

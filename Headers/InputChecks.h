@@ -76,7 +76,7 @@ public:
 
 	template<typename T>
 	T RunQuery(const char* Query);
-	//	std::vector<std::string> RunQuery(const char* Query, std::vector<std::string>& StringVector);
-
-
+	template<>
+	std::string RunQuery<std::string>(const char* Query);
+	 
 };
