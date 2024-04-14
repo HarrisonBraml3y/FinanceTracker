@@ -303,15 +303,7 @@ T SqlConnect::RunQuery(const char* Query) {
 				return Result;
 
 			}
-			if (Query == "SELECT Email FROM FinanceTrackerSheet") {
-				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
-					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Account, sizeof(Account), NULL);
-					std::cout << "Result: " << Account << std::endl;
 
-				}
-				return Result;
-
-			}
 
 			if (Query == "SELECT TOP 1 Account FROM FinanceTrackerSheet") {
 				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
@@ -372,17 +364,57 @@ std::string SqlConnect::RunQuery<std::string>(const char* Query) {
 
 		SQLRETURN FetchResult;
 
-		if (Query == "SELECT Balance From FinanceTrackerSheet WHERE Account = '3'") {
-			while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {		//returns sql_invalid_handle 
-				SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Balance, sizeof(Balance), NULL);
-				std::cout << "Balance Result: " << Balance << std::endl;
-
+		do {
+			if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_STMT, SqlConnectionHandle, &SqlStmtHandle)) {
+				// Allocates the statement
+				break;
 			}
 
-			std::string BalanceStr = std::string(Balance);
-			Result = BalanceStr;
-			return Result;
-		}
+			if (SQL_SUCCESS != SQLExecDirect(SqlStmtHandle, (SQLCHAR*)Query, SQL_NTS)) {	//sqlexecdirect will take statement handle, text and text length 
+				// Executes a preparable statement
+				std::cout << "Error executing query" << std::endl;
+				showSQLError(SQL_HANDLE_STMT, SqlStmtHandle);
+				break;
+			}
+
+			else {
+
+				std::cout << "Query executed" << std::endl;
+				SQLRETURN FetchResult;
+
+				char Balance[256];
+				char Account[256];
+				char Text[256];
+
+				if (Query == "SELECT Email FROM FinanceTrackerSheet") {
+					while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {		//returns sql_invalid_handle 
+						std::cout << "H" << std::endl;
+						SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Balance, sizeof(Balance), NULL);
+						std::cout << "Result: " << Balance << std::endl;
+
+					}
+
+					std::string BalanceStr = std::string(Balance);
+					Result = BalanceStr;
+					return Result;
+				}
+
+				else {
+					while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS_WITH_INFO) {
+						SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Account, sizeof(Account), NULL);
+						std::cout << "Balance: " << Account << std::endl;
+
+					}
+					std::cout << "Executed" << std::endl;
+				}
+				return Result;
+			}
+		} while (false);
+
+
+
+
+
 
 	}
 
