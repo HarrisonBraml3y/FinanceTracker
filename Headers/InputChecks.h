@@ -78,5 +78,7 @@ public:
 	T RunQuery(const char* Query);
 	template<>
 	std::string RunQuery<std::string>(const char* Query);
+	template<>
+	bool RunQuery<bool>(const char* Query);
 	 
 };

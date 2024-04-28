@@ -83,6 +83,9 @@ void InputChecks::Register() {
 		return;
 	}
 
+	//check if email is in use
+	//Sql.RunQuery<double>("")
+
 	double AccountNo = GenerateAccount();
 	std::cout << "Account number: " << AccountNo << std::endl;
 	std::string AccountStr = std::to_string(AccountNo);
@@ -314,7 +317,7 @@ T SqlConnect::RunQuery(const char* Query) {
 				return Result;
 			}
 
-			if (Query == "INSERT INTO FinanceTrackerSheet(Email, Password, Account, Balance) VALUES(2, 3, 4, 5)") {		//executes, but this runs false
+			if (Query == "INSERT INTO FinanceTrackerSheet(Email, Password, Account, Balance) VALUES(2, 3, 4, 5)") {	
 				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
 					SQLGetData(SqlStmtHandle, 3, SQL_C_DEFAULT, &Account, sizeof(Account), NULL);
 
@@ -322,15 +325,15 @@ T SqlConnect::RunQuery(const char* Query) {
 				}
 			}
 
+
+
 			if (Query == "SELECT Balance From FinanceTrackerSheet WHERE Account = '3'") {
-				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {		//returns sql_invalid_handle 
+				while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {	
 					SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Balance, sizeof(Balance), NULL);
 					std::cout << "Balance Result: " << Balance << std::endl;
 
 				}
 
-//				double Bal = Balance;
-//				Result = Bal;
 				return Result;
 			}
 			else {
@@ -387,13 +390,32 @@ std::string SqlConnect::RunQuery<std::string>(const char* Query) {
 				char Text[256];
 
 				if (Query == "SELECT Email FROM FinanceTrackerSheet") {
-					while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {		//returns sql_invalid_handle 
-						std::cout << "H" << std::endl;
+					while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {	
 						SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Balance, sizeof(Balance), NULL);
 						std::cout << "Result: " << Balance << std::endl;
 
 					}
 
+					std::string BalanceStr = std::string(Balance);
+					Result = BalanceStr;
+					return Result;
+				}
+
+				if (Query == "SELECT TOP 1 'exists' FROM FinanceTrackerSheet WHERE Email = 'harrison-bramley@hotmail.com'") {
+					while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
+						SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Balance, sizeof(Balance), NULL);
+						std::cout << "Result: " << Balance << std::endl;
+					}
+					std::string BalanceStr = std::string(Balance);
+					Result = BalanceStr;
+					return Result;
+				}
+
+				if (Query == "SELECT CASE WHEN Email = 'harrison-bramley@hotmail.com' THEN 1 ELSE 0 END FROM FinanceTrackerSheet") {
+					while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
+						SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Balance, sizeof(Balance), NULL);
+						std::cout << "Result: " << Balance << std::endl;
+					}
 					std::string BalanceStr = std::string(Balance);
 					Result = BalanceStr;
 					return Result;
@@ -410,15 +432,71 @@ std::string SqlConnect::RunQuery<std::string>(const char* Query) {
 				return Result;
 			}
 		} while (false);
-
-
-
-
-
-
 	}
-
-
-
-
 }
+
+template<>
+bool SqlConnect::RunQuery<bool>(const char* Query) {
+	std::cout << "Query: " << Query << std::endl;
+	std::string Result;
+	char Temp[256];
+
+	SQLLEN RowCount;
+	if (!Connect()) {
+		std::cout << "No connection" << std::endl;
+		return 0;
+	}
+	else {
+
+		SQLRETURN FetchResult;
+
+		do {
+			if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_STMT, SqlConnectionHandle, &SqlStmtHandle)) {
+				// Allocates the statement
+				break;
+			}
+
+			if (SQL_SUCCESS != SQLExecDirect(SqlStmtHandle, (SQLCHAR*)Query, SQL_NTS)) {
+				// Executes a preparable statement
+				std::cout << "Error executing query" << std::endl;
+				showSQLError(SQL_HANDLE_STMT, SqlStmtHandle);
+				break;
+			}
+
+			else {
+
+				if (Query == "SELECT TOP 1 'exists' FROM FinanceTrackerSheet WHERE Email = 'harrison-bramley@hotmail.com'") {
+					while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
+						SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Temp, sizeof(Temp), NULL);
+						std::cout << "Result: " << Temp << std::endl;
+					}
+					std::string BalanceStr = std::string(Temp);
+					Result = BalanceStr;
+					if (BalanceStr == "exists") {
+						return true;
+					}
+					return false;
+				}
+
+				if (Query == "SELECT TOP 1 1 FROM FinanceTrackerSheet WHERE Email = 'harrison-bramley@hotmail.com'") {
+					while ((FetchResult = SQLFetch(SqlStmtHandle)) == SQL_SUCCESS) {
+						SQLGetData(SqlStmtHandle, 1, SQL_C_DEFAULT, &Temp, sizeof(Temp), NULL);
+						std::cout << "Result:" << Temp << std::endl;
+						}
+
+						if (Temp[0] == '1') {
+							return true;
+						}
+						else {
+							return false;
+						}
+
+				}
+
+
+			}
+		} while (false);
+	}
+	return false;
+}
+
